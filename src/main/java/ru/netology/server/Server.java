@@ -8,30 +8,16 @@ public class Server {
     public static void main(String[] args) {
 
         try (ServerSocket serverSocket = new ServerSocket(8888)) {
+
             Socket socket = serverSocket.accept();
 
-            InputStream inputStream = socket.getInputStream();
-            OutputStream outputStream = socket.getOutputStream();
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+            System.out.println("New connection accepted");
 
-            String message;
-            while (true) {
-                while ((message = bufferedReader.readLine()) != null) {
-                    int vvod = square(message);
-
-                    if (vvod == 0){
-                        bufferedWriter.write(message + " не возвести в квадрат, тут работаем только с int(введите число)");
-                    } else {
-                        bufferedWriter.write("Квадрат числа " + message + " равен " + vvod);
-                    }
-                    bufferedWriter.newLine();
-                    bufferedWriter.flush();
-                    break;
-
-                }
-            }
+            final String message = in.readLine();
+            out.println(String.format("Hi %s, your port is %d", message, socket.getPort()));
 
 
         } catch (IOException e) {
@@ -41,13 +27,4 @@ public class Server {
 
     }
 
-    public static int square(String message) {
-        try {
-            int a = Integer.parseInt(message);
-            return a * a;
-        } catch (Exception e) {
-            return 0;
-        }
-
-    }
 }
